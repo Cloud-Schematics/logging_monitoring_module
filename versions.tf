@@ -5,11 +5,12 @@
 terraform {
   required_providers {
     ibm = {
-      source = "IBM-Cloud/ibm"
-      version = "~>1.31.0"
+      source  = "IBM-Cloud/ibm"
+      version = "~>1.38.2"
     }
   }
-  experiments = [ module_variable_optional_attrs ]
+  required_version = ">=1.0"
+  experiments      = [module_variable_optional_attrs]
 }
 
 ##############################################################################

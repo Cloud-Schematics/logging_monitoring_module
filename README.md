@@ -1,32 +1,34 @@
 # IBM Cloud Logging and Monitoring
 
-This module creates a LogDNA instance and a Sysdig Instance in a single region in a resource group. This module can optionally also provision activity tracker.
+This module allows users to create or load from data a logdna and sysdig instance. This module can optionally also provision activity tracker.
 
 ## Module Variables
 
-Name                    | Type         | Description                                                                                                   | Default
------------------------ | ------------ | ------------------------------------------------------------------------------------------------------------- | ----------------------
-prefix                  | string       | A unique identifier need to provision resources. Must begin with a letter                                     | fs-refarch-dev
-region                  | string       | Region where resources will be created                                                                        | us-south
-resource_group_id       | string       | ID of the resource group where instances will be created                                                      | 
-tags                    | list(string) | A list of tags to be added to resources                                                                       | [ "fs-cloud-refarch" ]
-sysdig_plan             | string       | Type of sysdig plan. Can be `graduated-tier` or `graduated-tier-sysdig-secure-plus-monitor`                   | graduated-tier
-logdna_plan             | string       | Type of logdna and activity tracker plan. Can be `14-day`, `30-day`, `7-day`, or `hipaa-30-day`               | 7-day
-create_activity_tracker | bool         | Create activity tracker. Only one instance of activity tracker can be provisioned per region in each account. | false
-service_endpoints       | string       | Service endpoints. Can be `public`, `private`, or `public-and-private`                                        | private
+Name                      | Type                                                                                                                       | Description                                                                                                                                                                                                                                                         | Sensitive | Default
+------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ---------------------------------
+prefix                    | string                                                                                                                     | A unique identifier for resources. Must begin with a letter. This prefix will be prepended to any resources provisioned by th  is template.                                                                                                                           |           | gcat-multizone-schematics
+region                    | string                                                                                                                     | Region where resources will be created                                                                                                                                                                                                                                |           | us-south
+resource_group_id         | string                                                                                                                     | Resource group ID to use for all services created                                                                                                                                                                                                                     |           | 
+tags                      | list(string)                                                                                                               | A list of tags to be added to resources                                                                                                                                                                                                                               |           | ["fs-cloud-refarch"]
+service_endpoints         | string                                                                                                                     | Service endpoints. Can be `public`, `private`, or `public-and-private`                                                                                                                                                                                                |           | private
+sysdig                    | object({ name = optional(string) use_data = optional(bool) plan = optional(string) resource_group_id = optional(string) }) | Object describing sysdig deployment. If use data is false and name is not used, a name will be automatically generated. A pla  n is only required on creation of an instance. If no resource group ID is provided, resource will use `var.resource_group_id` instead. |           | {<br>plan = "graduated-tier"<br>}
+logdna                    | object({ name = optional(string) use_data = optional(bool) plan = optional(string) resource_group_id = optional(string) }) | Object describing logdna deployment. If use data is false and name is not used, a name will be automatically generated. A pla  n is only required on creation of an instance. If no resource group ID is provided, resource will use `var.resource_group_id` instead. |           | {<br>plan = "7-day"<br>}
+create_activity_tracker   | bool                                                                                                                       | Create activity tracker. Only one instance of activity tracker can be provisioned per region in each account.                  
+
+---                                                                                                                | Create activity tracker. Only one instance of activity tracker can be provisioned per region in each account.                                                                                                                                                       |           | false
 
 ## Example Usage
 
-```hcl-terraform
+```terraform
 module logging_and_monitoring {
-    source = "./logging_and_monitoring"
-
-    prefix                  = var.prefix
-    region                  = var.region
-    resource_group_id       = data.ibm_resource_group.resource_group.id
-    tags                    = var.tags
-    sysdig_plan             = var.sysdig_plan
-    logdna_plan             = var.logdna_plan
-    create_activity_tracker = var.create_activity_tracker
+  source                  = "github.com/Cloud-Schematics/logging_monitoring_module.git"
+  prefix                  = var.prefix
+  region                  = var.region
+  resource_group_id       = var.resource_group_id
+  tags                    = var.tags
+  service_endpoints       = var.service_endpoints
+  sysdig                  = var.sysdig
+  logdna                  = var.logdna
+  create_activity_tracker = var.create_activity_tracker
 }
 ```
